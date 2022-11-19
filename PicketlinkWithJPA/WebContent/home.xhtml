@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core">
+      <p>Welcome to Login Page!</p>
+
+
+<ui:fragment rendered="#{identity.loggedIn}">
+    <div>You are logged in as: <b>#{identity.account.loginName}</b></div>
+ 
+    <ui:fragment rendered="#{authorizationChecker.isMember('writers')}">
+      <div>You are a member of the 'writers' group.</div>
+    </ui:fragment> 
+     <ui:fragment rendered="#{authorizationChecker.isMember('publishers')}">
+      <div>You are a member of the 'publishers' group.</div>
+    </ui:fragment>  
+    <ui:fragment rendered="#{authorizationChecker.hasRole('manager',identity.account.loginName)}">
+      <div>You have been granted the 'manager' role ! </div>
+    </ui:fragment>   
+    <ui:fragment rendered="#{authorizationChecker.hasGroupRole('admin', 'publishers')}">
+      <div>You have been granted the 'admin' role in the 'publishers' group.</div>
+       <div> You can grant roles</div> 
+      <h:form id="grantForm">
+       		<h:messages globalOnly="true"/>
+
+		    <div class="userNameRow">
+		        <h:outputLabel for="userName" value="Username" styleClass="userNameLabel"/>
+		        <h:inputText id="userName" value="#{grantUserRole.loginName}"/>
+		    </div>
+		    
+		    <div class="loginRow">
+		        <h:outputLabel for="roleName" value="RoleName" styleClass="roleNameLabel"/>
+		        <h:inputText id="roleName" value="#{grantUserRole.roleName}" redisplay="true"/>
+		    </div>
+		    <div class="buttons">
+		        <h:commandButton id="assign" value="Assign" action="#{grantUserRole.grantRole}" styleClass="assignButton"/>
+		        <div>You assigned a new Role : <b>#{identity.account.loginName}</b></div>
+		    </div>
+       </h:form>        
+    </ui:fragment>   
+    <h:form>
+        <h:commandButton id="logout" value="Log out" action="#{identity.logout}"/>
+    </h:form> 
+</ui:fragment>
+
+<h:form id="loginForm" rendered="#{not identity.loggedIn}">
+    <h:messages globalOnly="true"/>
+
+    <div class="loginRow">
+        <h:outputLabel for="name" value="Username" styleClass="loginLabel"/>
+        <h:inputText id="name" value="#{loginCredentials.userId}"/>
+    </div>
+
+    <div class="loginRow">
+        <h:outputLabel for="password" value="Password" styleClass="loginLabel"/>
+        <h:inputSecret id="password" value="#{loginCredentials.password}" redisplay="true"/>
+    </div>
+
+    <div class="buttons">
+        <h:commandButton id="login" value="Login" action="#{loginController.login}" styleClass="loginButton"/>
+    </div>
+	
+    
+    <p>
+      Each of accounts has different privileges assigned to them.
+    </p>
+    
+     <p>
+     Don't have an account?  
+     Click the <h:outputLink id="signup" value="signup.xhtml">link </h:outputLink> to access Our Signup page!
+          
+       </p>
+
+</h:form>
+
+<ui:fragment rendered="#{identity.loggedIn}">
+
+    <h3>Articles</h3>
+    
+    <ui:fragment rendered="#{empty articleController.articles}">
+      <p>No articles exist - why don't you create one?</p>
+    </ui:fragment>
+
+    <h:messages/>
+
+    <h:form>
+        <h:dataTable value="#{articleController.articles}" var="article" rendered="#{not empty articleController.articles}"
+                border="1">
+            <h:column>
+                <f:facet name="header">Title</f:facet>
+                #{article.title}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Author</f:facet>
+                #{article.author}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Action</f:facet>
+                <h:commandLink action="${articleController.showUpdate(article)}" rendered="#{identity.hasPermission(article, 'update')}">[Edit]</h:commandLink>
+                <h:commandLink action="${articleController.delete(article)}">[Delete]</h:commandLink>
+            </h:column>
+        </h:dataTable>
+        <br/>
+        <div>
+            <h:commandLink value="Create new article" action="#{articleController.showCreate}"/>
+        </div>
+    </h:form>
+
+  </ui:fragment>    
+
+  <br style="clear:both"/>
+
+
+
+<br style="clear:both"/>
+</html>

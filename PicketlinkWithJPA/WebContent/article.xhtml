@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+  <h2>
+    Create new article
+  </h2>
+
+  <ui:fragment rendered="#{identity.loggedIn}">
+    <h:form>
+      <div>
+        Title
+        <h:inputText value="#{articleController.article.title}"/>
+      </div>
+      
+      <h:inputTextarea value="#{articleController.article.content}" style="width:600px;height:400px"/>
+
+      <ui:fragment rendered="#{articleController.article.id == null}">
+          <div>
+            <h:commandButton value="Save Article" action="#{articleController.create}"/>
+          </div>
+      </ui:fragment>
+
+        <ui:fragment rendered="#{articleController.article.id != null}">
+            <div>
+                <h:commandButton value="Save Article" action="#{articleController.update}"/>
+            </div>
+        </ui:fragment>
+</h:form>
+
+  </ui:fragment>
+
+  <ui:fragment rendered="#{not identity.loggedIn}">
+     To create a new article you must <h:link value="first log in" outcome="home"/>
+  </ui:fragment>
+     
+  <br style="clear:both"/>
+
+</html>
